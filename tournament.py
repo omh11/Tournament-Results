@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# 
+#
 # tournament.py -- implementation of a Swiss-system tournament
 #
 
@@ -48,13 +48,14 @@ def deletePlayers():
     # Close connection
     conn.close
 
+
 def countPlayers():
     """Returns the number of players currently registered."""
 
     # Connect to database
     conn = connect()
 
-    #Set up cursor
+    # Set up cursor
     cursor = conn.cursor()
 
     # Execute query to count number of players in "players" table
@@ -69,16 +70,17 @@ def countPlayers():
 
     # Close connection
     conn.close
-    
+
     # Return number of players for function call
     return numOfPlayers
 
+
 def registerPlayer(name):
     """Adds a player to the tournament database.
-  
+
     The database assigns a unique serial id number for the player.  (This
     should be handled by your SQL database schema, not in your Python code.)
-  
+
     Args:
       name: the player's full name (need not be unique).
     """
@@ -97,11 +99,12 @@ def registerPlayer(name):
     # Close connection
     conn.close
 
+
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
 
-    The first entry in the list should be the player in first place, or a player
-    tied for first place if there is currently a tie.
+    The first entry in the list should be the player in first place,
+    or a player tied for first place if there is currently a tie.
 
     Returns:
       A list of tuples, each of which contains (id, name, wins, matches):
@@ -127,19 +130,23 @@ def playerStandings():
 
     # Store query results in results list
     playerStandings = cursor.fetchall()
-    
-    # If player standings comes back empty then populate matches table from ids in players table
+
+    # If player standings comes back empty then populate matches table from
+    # ids in players table
     if playerStandings == []:
 
         # Fetch registered players ids database
         cursor.execute("SELECT id FROM players;")
         playersDatabase = cursor.fetchall()
 
-        # Iterate through the list of IDs to populate matches table for first time
+        # Iterate through the list of IDs to populate matches table for
+        # first time
         for IDdata in playersDatabase:
-            
-            #Enter each registered player id into matches database and give them zero points 
-            cursor.execute("INSERT INTO matches (ID, points, numofmatches) values (%s,'0','0');", (IDdata[0],))
+
+            # Enter each registered player id into matches database and give
+            # them zero points
+            cursor.execute("INSERT INTO matches (ID, points, numofmatches) \
+                            VALUES (%s,'0','0');", (IDdata[0],))
 
         # Commit changes after for loop is finished
         conn.commit()
@@ -154,13 +161,13 @@ def playerStandings():
 
         # Fetch the query result
         playerStandings = cursor.fetchall()
-    
+
     # Close connection
     conn.close
 
     # Return the playerStandings list
     return playerStandings
-    
+
 
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
@@ -184,22 +191,22 @@ def reportMatch(winner, loser):
     cursor.execute("UPDATE matches \
                     SET numofmatches = numofmatches + 1 \
                     WHERE id = %s;", (loser,))
-    
+
     # Commit changes
     conn.commit()
 
     # Close connection
     conn.close
 
- 
+
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
-  
+
     Assuming that there are an even number of players registered, each player
     appears exactly once in the pairings.  Each player is paired with another
     player with an equal or nearly-equal win record, that is, a player adjacent
     to him or her in the standings.
-  
+
     Returns:
       A list of tuples, each of which contains (id1, name1, id2, name2)
         id1: the first player's unique id
@@ -207,11 +214,11 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-    
+
     # Connect to database
     conn = connect()
 
-    #Set up cursor
+    # Set up cursor
     cursor = conn.cursor()
 
     # Retrieve playerStandings table
@@ -226,9 +233,9 @@ def swissPairings():
     for row in playerStandingsTable:
         temp.append(row[0])
         temp.append(row[1])
-        
+
     # Loop through the 1D list and pack the pairs in tuples inside a list
-    for idx in xrange(0,len(temp),4):
+    for idx in xrange(0, len(temp), 4):
         for off in range(4):
             tupletemp = tupletemp + (temp[idx+off],)
         swissPairs.append(tupletemp)
